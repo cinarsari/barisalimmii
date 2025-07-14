@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barışalım mı? ❤️</title>
+
+  <!-- Basit, mobil‑uyumlu stil -->
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+      gap:2rem;background:linear-gradient(135deg,#f8fafc 0%,#e0e7ff 100%);
+      overflow:hidden;                 /* Hayır butonu dışarı taşarsa scrollbar çıkmasın */
+    }
+    h1{font-size:clamp(1.6rem,6vw,2.4rem);text-align:center;color:#1f2937}
+
+    /* Düğmeler */
+    .btn-row{display:flex;gap:2rem;position:relative;z-index:2}
+    button{
+      padding:.9rem 3rem;border:none;border-radius:9999px;cursor:pointer;font-size:1.05rem;font-weight:600;
+      transition:transform .35s ease,background .3s ease,box-shadow .3s ease,left .35s ease;
+      box-shadow:0 3px 12px rgba(0,0,0,.14);
+      position:relative;
+    }
+    #yes{background:#10b981;color:#fff}
+    #yes:hover{background:#0f9b6e}
+    #no {background:#ef4444;color:#fff}
+    #no:hover{background:#d32f2f}
+    /* Evet büyürken kullanılan ölçek */
+    #yes.grow{transform:scale(var(--scale,1))}
+
+    /* Tatlı kedi GIF’i */
+    .cat{
+      width:220px;max-width:70vw;border-radius:16px;
+      box-shadow:0 4px 14px rgba(0,0,0,.15);z-index:1
+    }
+
+    /* Evet tüm ekranı kaplayınca */
+    .overlay{
+      position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+      background:#10b981;color:#fff;font-size:clamp(2rem,6vw,3rem);text-align:center;z-index:999;
+      gap:1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="prompt">Seni üzdüğüm için özür dilerim, barışalım mı? ❤️</h1>
+
+  <div class="btn-row">
+    <button id="yes" class="grow">Evet</button>
+    <button id="no">Hayır</button>
+  </div>
+
+  <!-- İstediğin başka bir GIF URL’siyle değiştirebilirsin -->
+  <img class="cat" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Tatlı kedi GIF'i">
+
+  <script>
+    /* --- Elemanlar --- */
+    const promptEl = document.getElementById("prompt");
+    const yesBtn   = document.getElementById("yes");
+    const noBtn    = document.getElementById("no");
+
+    /* --- Durum değişkenleri --- */
+    let noClicks = 0;          // Kaç kez “Hayır”a basıldı
+    let yesScale = 1;          // “Evet” butonunun ölçeği
+    let offset   = 0;          // “Hayır”ın X ekseninde kayma miktarı
+    let dir      = 1;          // Hangi yöne kayacağı (1: sağ, -1: sol)
+
+    /* --- Sırayla gösterilecek uyarı metinleri --- */
+    const texts = [
+      "Emin misin?",
+      "Gerçekten emin misin?",
+      "Bu tarz şeyler olacak…",
+      "Kararından dönebilirsin 🙂",
+      "Bak, 'Evet' büyüyor!"
+    ];
+
+    /* --- Hayır --- */
+    noBtn.addEventListener("click", () => {
+      /* Metni sırayla değiştir */
+      promptEl.textContent = texts[noClicks] || "Hâlâ 'Hayır' mı diyorsun?";
+      noClicks++;
+
+      /* Evet'i büyüt */
+      yesScale += 0.6;
+      yesBtn.style.setProperty("--scale", yesScale);
+
+      /* Hayır'ı yana kaydır (sağ‑sol dönüşümlü) */
+      offset += 80;                 // her tıklamada biraz daha uzağa
+      noBtn.style.transform = `translateX(${dir * offset}px)`;
+      dir *= -1;                    // yön değiştir
+
+      /* Evet yeterince büyürse ekranı kapla */
+      if (yesScale >= 6) showOverlay();
+    });
+
+    /* --- Evet --- */
+    yesBtn.addEventListener("click", () => showOverlay(true));
+
+    /* --- Tam ekran mesaj --- */
+    function showOverlay(agreed = false){
+      const div = document.createElement("div");
+      div.className = "overlay";
+      div.innerHTML = agreed
+        ? "Yaşasın! 💖<br>Barıştık!"
+        : "Tamam, ben buradayım…";
+
+      document.body.appendChild(div);
+    }
+  </script>
+</body>
+</html>
